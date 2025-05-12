@@ -1,0 +1,66 @@
+const { TonClient } = require("@tonclient/core");
+const { libNode } = require("@tonclient/lib-node");
+
+TonClient.useBinaryLibrary(libNode);
+
+const client = new TonClient({ network: { server_address: "net.ton.dev" } });
+
+// 1. Create Jetton
+async function createJetton() {
+    const jettonData = {
+        name: "MyJetton",
+        symbol: "MJ",
+        initialSupply: 1000,
+        // Other parameters
+    };
+
+    try {
+        const result = await client.jetton.create(jettonData);
+        console.log("Jetton created:", result);
+    } catch (error) {
+        console.error("Error creating Jetton:", error);
+    }
+}
+
+// 2. Connect to Wallet
+async function connectWallet() {
+    // Assume the user has connected their wallet
+    const walletAddress = "User 's wallet address";
+    console.log("Wallet connected:", walletAddress);
+    return walletAddress;
+}
+
+// 3. Spend Tokens
+async function transferJetton(toAddress, amount) {
+    try {
+        const tx = await client.jetton.transfer({
+            to: toAddress,
+            amount: amount,
+            // Other parameters
+        });
+        console.log("Transfer successful:", tx);
+    } catch (error) {
+        console.error("Error transferring Jetton:", error);
+    }
+}
+
+// 4. Validate Tokens
+async function checkBalance(userAddress) {
+    try {
+        const balance = await client.jetton.getBalance(userAddress);
+        console.log("User  balance:", balance);
+    } catch (error) {
+        console.error("Error checking balance:", error);
+    }
+}
+
+// 5. Testing and Security
+async function main() {
+    await createJetton();
+    const userAddress = await connectWallet();
+    await checkBalance(userAddress);
+    // Assume you want to transfer 10 tokens to another address
+    await transferJetton("Recipient address", 10);
+}
+
+main().catch(console.error);
