@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TON Gaming Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: Arial, sans-serif; direction: rtl; }
+        #gameCanvas { border: 2px solid #000; }
+    </style>
+</head>
+<body class="bg-gray-100 text-right">
+    <div class="container mx-auto p-4">
+        <!-- هدر و اتصال شبیه‌سازی‌شده -->
+        <header class="bg-blue-600 text-white p-4 rounded-lg mb-4">
+            <h1 class="text-2xl font-bold">پلتفرم بازی TON</h1>
+            <input id="walletInput" type="text" placeholder="آدرس کیف‌پول خود را وارد کنید" class="p-2 border rounded mt-2">
+            <button id="connectWallet" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mt-2">اتصال</button>
+            <p id="walletStatus" class="mt-2"></p>
+        </header>
+
+        <!-- بخش بازی‌ها -->
+        <section class="bg-white p-4 rounded-lg shadow mb-4">
+            <h2 class="text-xl font-bold mb-2">بازی‌های برنامه‌نویسی</h2>
+            <div class="flex space-x-4">
+                <button id="soloGameBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">بازی فردی</button>
+                <button id="groupGameBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">بازی گروهی</button>
+            </div>
+            <div id="gameArea" class="mt-4">
+                <p>برای شروع بازی، یکی از گزینه‌ها را انتخاب کنید.</p>
+                <canvas id="gameCanvas" width="400" height="400" class="hidden"></canvas>
+                <textarea id="codeInput" class="w-full h-32 p-2 border rounded mt-2 hidden" placeholder="کد خود را اینجا بنویسید..."></textarea>
+                <button id="submitCodeBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mt-2 hidden">ارسال کد</button>
+                <p id="gameResult" class="mt-2"></p>
+            </div>
+        </section>
+
+        <!-- جدول رده‌بندی -->
+        <section class="bg-white p-4 rounded-lg shadow mb-4">
+            <h2 class="text-xl font-bold mb-2">جدول رده‌بندی</h2>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border p-2">رتبه</th>
+                        <th class="border p-2">کاربر</th>
+                        <th class="border p-2">امتیاز</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard">
+                    <!-- پر می‌شود با جاوااسکریپت -->
+                </tbody>
+            </table>
+            <p id="leaderboardReward" class="mt-2"></p>
+        </section>
+
+        <!-- فروشگاه NFT -->
+        <section class="bg-white p-4 rounded-lg shadow mb-4">
+            <h2 class="text-xl font-bold mb-2">فروشگاه گیفت‌های NFT</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="border p-2 rounded">
+                    <h3>شمشیر ⚔️</h3>
+                    <p>قیمت: ۱ TON (شبیه‌سازی)</p>
+                    <button class="buy-nft bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded" data-item="sword" data-price="1">خرید</button>
+                </div>
+                <div class="border p-2 rounded">
+                    <h3>سپر 🛡️</h3>
+                    <p>قیمت: ۱.۵ TON (شبیه‌سازی)</p>
+                    <button class="buy-nft bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded" data-item="shield" data-price="1.5">خرید</button>
+                </div>
+            </div>
+            <p id="nftPurchaseResult" class="mt-2"></p>
+            <button id="duelBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-4">دوئل با فرد ناشناس</button>
+            <p id="duelResult" class="mt-2"></p>
+        </section>
+
+        <!-- بخش بوست -->
+        <section class="bg-white p-4 rounded-lg shadow">
+            <h2 class="text-xl font-bold mb-2">بوست برای پیشرفت سریع‌تر</h2>
+            <ul class="list-disc pr-5">
+                <li>عضویت در کانال/گروه: <button id="verifyMembershipBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">تأیید</button></li>
+                <li>زدن ۵۰ استارز به پست: <button id="verifyStarsBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">تأیید</button></li>
+                <li>دعوت از ۱۰ نفر: <button id="verifyReferralsBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">تأیید</button></li>
+                <li>تبلیغ ربات در ۳-۵ گروه: <button id="verifyAdsBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">تأیید</button></li>
+            </ul>
+            <p id="boostResult" class="mt-2"></p>
+        </section>
+    </div>
+
+    <script>
+        let walletAddress = null;
+        let userScore = 0;
+        let gamesPlayed = 0;
+        let leaderboard = [];
+        let ownedNFTs = [];
+
+        // اتصال شبیه‌سازی‌شده
+        document.getElementById('connectWallet').addEventListener('click', () => {
+            const input = document.getElementById('walletInput').value;
+            if (input) {
+                walletAddress = input;
+                document.getElementById('walletStatus').textContent = `کیف‌پول متصل شد: ${walletAddress.slice(0, 10)}...`;
+            } else {
+                document.getElementById('walletStatus').textContent = 'لطفاً آدرس کیف‌پول را وارد کنید!';
+            }
+        });
+
+        // بازی فردی
+        document.getElementById('soloGameBtn').addEventListener('click', () => {
+            if (!walletAddress) {
+                alert('لطفاً ابتدا به کیف‌پول متصل شوید!');
+                return;
+            }
+            startGame('solo');
+        });
+
+        // بازی گروهی
+        document.getElementById('groupGameBtn').addEventListener('click', () => {
+            if (!walletAddress) {
+                alert('لطفاً ابتدا به کیف‌پول متصل شوید!');
+                return;
+            }
+            startGame('group');
+        });
+
+        // شروع بازی
+        function startGame(type) {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.classList.remove('hidden');
+            document.getElementById('codeInput').classList.remove('hidden');
+            document.getElementById('submitCodeBtn').classList.remove('hidden');
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#000';
+            for (let x = 0; x < 10; x++) {
+                for (let y = 0; y < 10; y++) {
+                    if (Math.random() > 0.7) {
+                        ctx.fillRect(x * 40, y * 40, 40, 40);
+                    }
+                }
+            }
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(0, 0, 40, 40); // نقطه شروع
+            ctx.fillStyle = '#f00';
+            ctx.fillRect(360, 360, 40, 40); // نقطه پایان
+
+            document.getElementById('gameResult').textContent = `بازی ${type === 'solo' ? 'فردی' : 'گروهی'} شروع شد! کد خود را بنویسید تا به نقطه قرمز برسید.`;
+        }
+
+        // ارسال کد و بررسی
+        document.getElementById('submitCodeBtn').addEventListener('click', () => {
+            const code = document.getElementById('codeInput').value;
+            gamesPlayed++;
+
+            if (code.includes('move')) {
+                userScore += 10;
+                document.getElementById('gameResult').textContent = 'تبریک! شما برنده شدید. ۱۰ امتیاز کسب کردید.';
+                updateLeaderboard();
+
+                if (gamesPlayed >= 20 && gamesPlayed <= 30) {
+                    userScore += 50; // جایزه TON
+                    ownedNFTs.push('NFT Gift #' + gamesPlayed);
+                    document.getElementById('gameResult').textContent += ' 🎉 جایزه: ۵۰ TON + یک NFT!';
+                }
+            } else {
+                document.getElementById('gameResult').textContent = 'کد اشتباه است. دوباره تلاش کنید.';
+            }
+        });
+
+        // به‌روزرسانی جدول رده‌بندی
+        function updateLeaderboard() {
+            leaderboard.push({ user: walletAddress || 'کاربر ناشناس', score: userScore });
+            leaderboard.sort((a, b) => b.score - a.score);
+
+            const tbody = document.getElementById('leaderboard');
+            tbody.innerHTML = '';
+            leaderboard.slice(0, 5).forEach((entry, index) => {
+                const row = `<tr><td class="border p-2">${index + 1}</td><td class="border p-2">${entry.user.slice(0, 10)}...</td><td class="border p-2">${entry.score}</td></tr>`;
+                tbody.innerHTML += row;
+            });
+
+            if (leaderboard[0]?.user === walletAddress) {
+                document.getElementById('leaderboardReward').textContent = '🎉 شما نفر اول هستید! جایزه: ۱۰۰ TON';
+                userScore += 100;
+            }
+        }
+
+        // خرید NFT (شبیه‌سازی)
+        document.querySelectorAll('.buy-nft').forEach(button => {
+            button.addEventListener('click', () => {
+                if (!walletAddress) {
+                    alert('لطفاً ابتدا به کیف‌پول متصل شوید!');
+                    return;
+                }
+
+                const item = button.dataset.item;
+                const price = parseFloat(button.dataset.price);
+                if (confirm(`آیا می‌خواهید ${item} را با ${price} TON بخرید؟`)) {
+                    ownedNFTs.push(item);
+                    document.getElementById('nftPurchaseResult').textContent = `🎉 ${item} با موفقیت خریداری شد! (شبیه‌سازی)`;
+                }
+            });
+        });
+
+        // دوئل
+        document.getElementById('duelBtn').addEventListener('click', () => {
+            if (ownedNFTs.length === 0) {
+                document.getElementById('duelResult').textContent = 'برای دوئل حداقل یک NFT نیاز دارید!';
+                return;
+            }
+
+            const win = Math.random() > 0.5;
+            if (win) {
+                userScore += 50;
+                document.getElementById('duelResult').textContent = '🎉 شما در دوئل برنده شدید! ۵۰ امتیاز کسب کردید.';
+                updateLeaderboard();
+            } else {
+                document.getElementById('duelResult').textContent = 'متأسفانه در دوئل باختید. دوباره تلاش کنید!';
+            }
+        });
+
+        // بوست‌ها
+        document.getElementById('verifyMembershipBtn').addEventListener('click', () => {
+            userScore += 20;
+            document.getElementById('boostResult').textContent = 'عضویت تأیید شد! ۲۰ امتیاز کسب کردید.';
+            updateLeaderboard();
+        });
+
+        document.getElementById('verifyStarsBtn').addEventListener('click', () => {
+            userScore += 20;
+            document.getElementById('boostResult').textContent = '۵۰ استارز تأیید شد! ۲۰ امتیاز کسب کردید.';
+            updateLeaderboard();
+        });
+
+        document.getElementById('verifyReferralsBtn').addEventListener('click', () => {
+            userScore += 50;
+            document.getElementById('boostResult').textContent = '۱۰ رفرال تأیید شد! ۵۰ امتیاز کسب کردید.';
+            updateLeaderboard();
+        });
+
+        document.getElementById('verifyAdsBtn').addEventListener('click', () => {
+            userScore += 30;
+            document.getElementById('boostResult').textContent = 'تبلیغات تأیید شد! ۳۰ امتیاز کسب کردید.';
+            updateLeaderboard();
+        });
+    </script>
+</body>
+          </html>
