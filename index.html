@@ -3,199 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GemStorm - TON Gaming Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        #gameCanvas { border: 2px solid #000; }
-        .header-bg { background-color: #1E40AF; } /* Blue */
-        .btn-primary { background-color: #DC2626; } /* Red */
-        .btn-primary:hover { background-color: #B91C1C; }
-    </style>
+    <title>GameStorm</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto p-4">
-        <!-- Welcome Section -->
-        <section class="bg-white p-4 rounded-lg shadow mb-4 text-center">
-            <h1 class="text-4xl font-bold text-red-600">Welcome to GemStorm</h1>
-            <p class="text-lg mt-2">Your ultimate TON gaming platform for fun, challenges, and rewards!</p>
-        </section>
-
-        <!-- Header and Wallet Connection -->
-        <header class="header-bg text-white p-4 rounded-lg mb-4">
-            <h1 class="text-2xl font-bold">TON Gaming Platform</h1>
-            <input id="walletInput" type="text" placeholder="Enter your wallet address" class="p-2 border rounded mt-2">
-            <button id="connectWallet" class="btn-primary text-white px-4 py-2 rounded mt-2">Connect</button>
-            <p id="walletStatus" class="mt-2"></p>
-        </header>
-
-        <!-- Games Section -->
-        <section class="bg-white p-4 rounded-lg shadow mb-4">
-            <h2 class="text-xl font-bold mb-2">Games</h2>
-            <div class="flex space-x-4">
-                <button id="soloGameBtn" class="btn-primary text-white px-4 py-2 rounded">Solo Game</button>
-                <button id="groupGameBtn" class="btn-primary text-white px-4 py-2 rounded">Group Game</button>
-                <button id="codingGameBtn" class="btn-primary text-white px-4 py-2 rounded">Coding Game</button>
-                <button id="puzzleGameBtn" class="btn-primary text-white px-4 py-2 rounded">Puzzle Game</button>
-                <button id="hardGameBtn" class="btn-primary text-white px-4 py-2 rounded">Hard Game</button>
-            </div>
-            <div id="gameArea" class="mt-4">
-                <p>Select a game mode to start playing.</p>
-                <canvas id="gameCanvas" width="400" height="400" class="hidden"></canvas>
-                <textarea id="codeInput" class="w-full h-32 p-2 border rounded mt-2 hidden" placeholder="Write your code here..."></textarea>
-                <button id="submitCodeBtn" class="btn-primary text-white px-4 py-2 rounded mt-2 hidden">Submit Code</button>
-                <p id="gameResult" class="mt-2"></p>
-            </div>
-        </section>
-
-        <!-- Levels Section -->
-        <section class="bg-white p-4 rounded-lg shadow mb-4">
-            <h2 class="text-xl font-bold mb-2">Levels to Boost Your Score</h2>
-            <ul class="list-disc pl-5">
-                <li>Join a channel or group (3 boosts): <button id="verifyMembershipBtn" class="btn-primary text-white px-2 py-1 rounded">Verify</button></li>
-                <li>Give 20 stars to a post: <button id="verifyStarsBtn" class="btn-primary text-white px-2 py-1 rounded">Verify</button></li>
-                <li>Invite 10 referrals: <button id="verifyReferralsBtn" class="btn-primary text-white px-2 py-1 rounded">Verify</button></li>
-            </ul>
-            <p id="boostResult" class="mt-2"></p>
-        </section>
-
-        <!-- Links to Other Pages -->
-        <section class="bg-white p-4 rounded-lg shadow mb-4">
-            <h2 class="text-xl font-bold mb-2">Explore More</h2>
-            <div class="flex space-x-4">
-                <a href="store.html" class="btn-primary text-white px-4 py-2 rounded flex items-center">
-                    <span class="mr-2">🛒</span> NFT Store
-                </a>
-                <a href="leaderboard.html" class="btn-primary text-white px-4 py-2 rounded flex items-center">
-                    <span class="mr-2">🏆</span> Leaderboard
-                </a>
-            </div>
-        </section>
+<body>
+    <!-- Welcome Screen -->
+    <div id="welcome" class="full-screen">
+        <img src="assets/welcome.jpg" alt="Welcome to GameStorm" class="bg-image">
+        <h1>Welcome to GameStorm</h1>
     </div>
 
-    <script>
-        let walletAddress = null;
-        let userScore = 0;
-        let gamesPlayed = 0;
-        let ownedNFTs = [];
+    <!-- Games Section -->
+    <div id="games" class="full-screen">
+        <h2>Games</h2>
+        <div class="game-card" onclick="startGame('football')">
+            <img src="assets/football.png" alt="Football">
+            <p>Football (Group)</p>
+        </div>
+        <div class="game-card" onclick="startGame('puzzle')">
+            <img src="assets/puzzle.png" alt="Puzzle">
+            <p>Puzzle (Solo)</p>
+        </div>
+        <div class="game-card" onclick="startGame('duel')">
+            <img src="assets/duel.png" alt="Duel">
+            <p>Duel (Tekken Style)</p>
+        </div>
+    </div>
 
-        // Wallet Connection
-        document.getElementById('connectWallet').addEventListener('click', () => {
-            const input = document.getElementById('walletInput').value;
-            if (input) {
-                walletAddress = input;
-                document.getElementById('walletStatus').textContent = `Wallet connected: ${walletAddress.slice(0, 10)}...`;
-            } else {
-                document.getElementById('walletStatus').textContent = 'Please enter a wallet address!';
-            }
-        });
+    <!-- NFT Collection Section -->
+    <div id="nfts" class="full-screen">
+        <h2>NFT Collection</h2>
+        <!-- NFTs will be loaded dynamically -->
+    </div>
 
-        // Game Buttons
-        document.getElementById('soloGameBtn').addEventListener('click', () => {
-            if (!walletAddress) {
-                alert('Please connect your wallet first!');
-                return;
-            }
-            startGame('solo');
-        });
+    <!-- Leaderboard Section -->
+    <div id="leaderboard" class="full-screen">
+        <h2>Leaderboard</h2>
+        <ol id="leaderboard-list">
+            <!-- Leaderboard will be loaded dynamically -->
+        </ol>
+    </div>
 
-        document.getElementById('groupGameBtn').addEventListener('click', () => {
-            if (!walletAddress) {
-                alert('Please connect your wallet first!');
-                return;
-            }
-            startGame('group');
-        });
-
-        document.getElementById('codingGameBtn').addEventListener('click', () => {
-            if (!walletAddress) {
-                alert('Please connect your wallet first!');
-                return;
-            }
-            startGame('coding');
-        });
-
-        document.getElementById('puzzleGameBtn').addEventListener('click', () => {
-            if (!walletAddress) {
-                alert('Please connect your wallet first!');
-                return;
-            }
-            startGame('puzzle');
-        });
-
-        document.getElementById('hardGameBtn').addEventListener('click', () => {
-            if (!walletAddress) {
-                alert('Please connect your wallet first!');
-                return;
-            }
-            startGame('hard');
-        });
-
-        // Start Game
-        function startGame(type) {
-            const canvas = document.getElementById('gameCanvas');
-            const ctx = canvas.getContext('2d');
-            canvas.classList.remove('hidden');
-            document.getElementById('codeInput').classList.remove('hidden');
-            document.getElementById('submitCodeBtn').classList.remove('hidden');
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#000';
-            for (let x = 0; x < 10; x++) {
-                for (let y = 0; y < 10; y++) {
-                    if (Math.random() > (type === 'hard' ? 0.5 : 0.7)) {
-                        ctx.fillRect(x * 40, y * 40, 40, 40);
-                    }
-                }
-            }
-            ctx.fillStyle = '#0f0';
-            ctx.fillRect(0, 0, 40, 40); // Start point
-            ctx.fillStyle = '#f00';
-            ctx.fillRect(360, 360, 40, 40); // End point
-
-            document.getElementById('gameResult').textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} game started! Write your code to reach the red point.`;
-        }
-
-        // Submit Code
-        document.getElementById('submitCodeBtn').addEventListener('click', () => {
-            const code = document.getElementById('codeInput').value;
-            gamesPlayed++;
-
-            if (code.includes('move')) {
-                userScore += 10;
-                document.getElementById('gameResult').textContent = 'Congrats! You won. You earned 10 points.';
-                localStorage.setItem('userScore', userScore); // Save score
-
-                if (gamesPlayed >= 20 && gamesPlayed <= 30) {
-                    userScore += 50;
-                    ownedNFTs.push('NFT Gift #' + gamesPlayed);
-                    localStorage.setItem('userScore', userScore);
-                    localStorage.setItem('ownedNFTs', JSON.stringify(ownedNFTs));
-                    document.getElementById('gameResult').textContent += ' 🎉 Bonus: 50 TON + an NFT!';
-                }
-            } else {
-                document.getElementById('gameResult').textContent = 'Incorrect code. Try again.';
-            }
-        });
-
-        // Boost Buttons
-        document.getElementById('verifyMembershipBtn').addEventListener('click', () => {
-            userScore += 20;
-            document.getElementById('boostResult').textContent = 'Membership verified! You earned 20 points.';
-            localStorage.setItem('userScore', userScore);
-        });
-
-        document.getElementById('verifyStarsBtn').addEventListener('click', () => {
-            userScore += 20;
-            document.getElementById('boostResult').textContent = '20 stars verified! You earned 20 points.';
-            localStorage.setItem('userScore', userScore);
-        });
-
-        document.getElementById('verifyReferralsBtn').addEventListener('click', () => {
-            userScore += 50;
-            document.getElementById('boostResult').textContent = '10 referrals verified! You earned 50 points.';
-            localStorage.setItem('userScore', userScore);
-        });
-    </script>
+    <script src="scripts.js"></script>
 </body>
 </html>
