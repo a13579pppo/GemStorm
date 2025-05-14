@@ -1,0 +1,8 @@
+[
+    {"id": "sword", "name": "Fire Sword", "price": 5, "image": "assets/sword.png"},
+    {"id": "shield", "name": "Iron Shield", "price": 10, "image": "assets/shield.png"},
+    {"id": "gun", "name": "Plasma Gun", "price": 20, "image": "assets/gun.png"},
+    {"id": "knife", "name": "Shadow Dagger", "price": 8, "image": "assets/knife.png"},
+    {"id": "armor", "name": "Dragon Armor", "price": 15, "image": "assets/armor.png"}
+    // Add 495 more NFTs with prices from 0.5 to 50 TON
+]
